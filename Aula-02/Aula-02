@@ -1,0 +1,103 @@
+-- 1. Cria um relatório para todos os pedidos de 1996 e seus clientes (152 linhas)
+
+SELECT * 
+FROM orders o 
+INNER JOIN customers c ON c.customer_id = o.customer_id
+WHERE EXTRACT(YEAR FROM o.order_date) = 1996; -- EXTRACT(part FROM date) part pode ser YEAR, MONTH, DAY, etc
+
+SELECT e.employee_id, e.last_name, c.contact_name
+FROM employees e 
+LEFT JOIN customers c ON e.city = c.city
+ORDER BY e.employee_id
+
+-- 2. Cria um relatório que mostra o número de funcionários e clientes de cada cidade que tem funcionários (5 linhas)
+SELECT e.city as cidade,
+		count(DISTINCT e.employee_id) as quantidade_fucionarios,
+		count(DISTINCT c.customer_id) as quantidade_clientes
+FROM employees e 
+LEFT JOIN customers c ON e.city = c.city
+GROUP BY e.city
+ORDER BY e.city
+
+-- 3. Cria um relatório que mostra o número de funcionários e clientes de cada cidade que tem clientes (69 linhas)
+SELECT c.city as cidade,
+		count(DISTINCT e.employee_id) as quantidade_fucionarios,
+		count(DISTINCT c.customer_id) as quantidade_clientes
+FROM employees e 
+RIGHT JOIN customers c ON e.city = c.city
+GROUP BY c.city
+ORDER BY cidade
+
+-- 4.Cria um relatório que mostra o número de funcionários e clientes de cada cidade (71 linhas)
+SELECT
+	COALESCE(e.city, c.city) AS cidade,
+	COUNT(DISTINCT e.employee_id) AS numero_de_funcionarios,
+	COUNT(DISTINCT c.customer_id) AS numero_de_clientes
+FROM employees e 
+FULL JOIN customers c ON e.city = c.city
+GROUP BY e.city, c.city
+ORDER BY cidade;
+
+
+-- 1. Obter todas as colunas das tabelas Clientes, Pedidos e Fornecedores
+SELECT * FROM employees 
+SELECT * FROM orders
+SELECT * FROM suppliers 
+
+
+-- 2. Obter todos os Clientes em ordem alfabética por país e nome
+SELECT first_name,country
+FROM employees 
+ORDER BY first_name,country DESC
+
+-- 3. Obter os 5 pedidos mais antigos
+SELECT * FROM orders
+ORDER BY order_date
+LIMIT 5;
+
+-- 4. Obter a contagem de todos os Pedidos feitos durante 1997
+SELECT * FROM orders
+WHERE EXTRACT(YEAR FROM order_date) = 1997;
+
+SELECT COUNT(*) AS "Number of Orders During 1997"
+FROM orders
+WHERE order_date BETWEEN '1997-1-1' AND '1997-12-31';
+
+-- 5. Obter os nomes de todas as pessoas de contato onde a pessoa é um gerente, em ordem alfabética
+SELECT contact_name
+FROM customers
+WHERE contact_title like '%Manager%'
+ORDER BY contact_name;
+
+
+-- 6. Obter todos os pedidos feitos em 19 de maio de 1997
+SELECT order_date
+FROM orders
+WHERE order_date = '1997-05-19'
+
+-- 5. Cria um relatório que mostra a quantidade total de produtos encomendados.
+-- Mostra apenas registros para produtos para os quais a quantidade encomendada é menor que 200 (5 linhas)
+SELECT * FROM products
+WHERE units_on_order < 200
+
+
+
+-- 6. Cria um relatório que mostra o total de pedidos por cliente desde 31 de dezembro de 1996.
+-- Cria um relatório que mostra o total de pedidos por cliente desde 31 de dezembro de 1996.
+-- O relatório deve retornar apenas linhas para as quais o total de pedidos é maior que 15 (5 linhas)
+SELECT customer_id, COUNT(order_id) AS total_de_pedidos
+FROM orders
+WHERE order_date > '1996-12-31'
+GROUP BY customer_id
+HAVING COUNT(order_id) > 15
+ORDER BY total_de_pedidos;
+-- O relatório deve retornar apenas linhas para as quais o total de pedidos é maior que 15 (5 linhas)
+-- Cria um relatório que mostra a quantidade total de produtos encomendados.
+-- Mostra apenas registros para produtos para os quais a quantidade encomendada é menor que 200 (5 linhas)
+SELECT o.product_id, p.product_name, SUM(o.quantity) AS quantidade_total
+FROM order_details o
+JOIN products p ON p.product_id = o.product_id
+GROUP BY o.product_id, p.product_name
+HAVING SUM(o.quantity) < 200
+ORDER BY quantidade_total DESC;
+
